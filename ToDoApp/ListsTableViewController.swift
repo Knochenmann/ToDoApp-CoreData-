@@ -22,29 +22,34 @@ class ListsTableViewController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(showAlert))
     }
     
-    func showAlertOne(with title: String, and message: String) {
-//        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    func showEditingAlert(at indexPath: IndexPath) {
+        let alert = UIAlertController(title: "Edit list", message: "Edit the existing list", preferredStyle: .alert)
+
+        alert.addTextField { (textField) in
+            textField.placeholder = "List name"
+            textField.text = self.lists[indexPath.row].name
+            
+        }
+        alert.addTextField { (textField) in
+            textField.placeholder = "List description (optional)"
+            textField.text = self.lists[indexPath.row].note
+        }
+
+        let editAction = UIAlertAction(title: "Edit", style: .default) { (_) in
+            self.lists[indexPath.row].name = alert.textFields?.first?.text
+            self.lists[indexPath.row].note = alert.textFields?.last?.text
+            StorageManager.shared.saveContext()
+            self.tableView.reloadData()
+        }
+
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { (_) in
+            self.dismiss(animated: true)
+        }
+
+        alert.addAction(editAction)
+        alert.addAction(cancelAction)
 //
-//        alert.addTextField { (textField) in
-//            textField.placeholder = "Type a list name"
-//        }
-//        alert.addTextField { (textField) in
-//            textField.placeholder = "Add a note"
-//        }
-//
-//        let editAction = UIAlertAction(title: "Edit", style: .default) { (_) in
-//            StorageManager.shared.edit(taskList: <#T##List#>, name: <#T##String#>, note: <#T##String#>)
-//        }
-//
-//        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { (_) in
-//            self.dismiss(animated: true)
-//        }
-//
-//
-//        alert.addAction(action)
-//        alert.addAction(cancelAction)
-//
-//        present(alert, animated: true)
+        present(alert, animated: true)
     }
     
     @objc private func showAlert() {
@@ -106,7 +111,7 @@ class ListsTableViewController: UITableViewController {
         
         let editAction = UIContextualAction(style: .normal, title: "Edit") { (_, _, _) in
             //вставить алерт
-        
+            self.showEditingAlert(at: indexPath)
         }
         editAction.backgroundColor = .magenta
         
