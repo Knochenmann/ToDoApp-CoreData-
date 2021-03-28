@@ -50,6 +50,8 @@ class StorageManager {
         }
     }
     
+    // MARK: - Adding Functions
+    
     func addNewTaskList(completion: @escaping (List) -> Void) {
         guard let entityDescription = NSEntityDescription.entity(forEntityName: "List", in: context) else { return }
         guard let newList = NSManagedObject(entity: entityDescription, insertInto: context) as? List else { return }
@@ -60,10 +62,28 @@ class StorageManager {
         
     }
     
+    func addNewTask(completion: @escaping (Task) -> Void) {
+        guard let entityDescription = NSEntityDescription.entity(forEntityName: "Task", in: context) else { return }
+        guard let newTask = NSManagedObject(entity: entityDescription, insertInto: context) as? Task else { return }
+        
+        completion(newTask)
+        
+        saveContext()
+    }
+    
+    // MARK: - Deleting Functions
+    
     func delete(taskList: List) {
         context.delete(taskList)
         saveContext()
     }
+    
+    func delete(task: Task) {
+        context.delete(task)
+        saveContext()
+    }
+    
+    // MARK: - Editing Functions
     
     func edit(taskList: List, name: String, note: String) {
         taskList.name = name
@@ -71,4 +91,6 @@ class StorageManager {
         taskList.date = Date()
         saveContext()
     }
+    
+    
 }

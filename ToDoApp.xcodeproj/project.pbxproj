@@ -17,6 +17,7 @@
 		4A48A546260783D90091CA62 /* ListsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A48A545260783D90091CA62 /* ListsTableViewController.swift */; };
 		4A48A54B260789240091CA62 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A48A54A260789240091CA62 /* AlertController.swift */; };
 		4A48A54E260791840091CA62 /* ListsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A48A54D260791840091CA62 /* ListsTableViewCell.swift */; };
+		4AC6CD32260A7A7800F10C59 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC6CD31260A7A7800F10C59 /* TasksTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		4A48A545260783D90091CA62 /* ListsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsTableViewController.swift; sourceTree = "<group>"; };
 		4A48A54A260789240091CA62 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
 		4A48A54D260791840091CA62 /* ListsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsTableViewCell.swift; sourceTree = "<group>"; };
+		4AC6CD31260A7A7800F10C59 /* TasksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,19 +66,52 @@
 		4A48A52426077D430091CA62 /* ToDoApp */ = {
 			isa = PBXGroup;
 			children = (
-				4A48A52526077D430091CA62 /* AppDelegate.swift */,
-				4A48A52726077D430091CA62 /* SceneDelegate.swift */,
-				4A48A52B26077D440091CA62 /* Main.storyboard */,
-				4A48A54226077EC90091CA62 /* StorageManager.swift */,
-				4A48A545260783D90091CA62 /* ListsTableViewController.swift */,
-				4A48A54D260791840091CA62 /* ListsTableViewCell.swift */,
+				4AC6CD36260A7AE600F10C59 /* Storyboards */,
+				4AC6CD34260A7AB600F10C59 /* ViewControllers */,
+				4AC6CD35260A7AC900F10C59 /* CustomCells */,
 				4A48A54A260789240091CA62 /* AlertController.swift */,
+				4A48A54226077EC90091CA62 /* StorageManager.swift */,
 				4A48A53126077D480091CA62 /* Assets.xcassets */,
-				4A48A53326077D480091CA62 /* LaunchScreen.storyboard */,
 				4A48A53626077D480091CA62 /* Info.plist */,
 				4A48A52E26077D440091CA62 /* ToDoApp.xcdatamodeld */,
+				4AC6CD37260A7AF200F10C59 /* Delegates */,
 			);
 			path = ToDoApp;
+			sourceTree = "<group>";
+		};
+		4AC6CD34260A7AB600F10C59 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				4A48A545260783D90091CA62 /* ListsTableViewController.swift */,
+				4AC6CD31260A7A7800F10C59 /* TasksTableViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		4AC6CD35260A7AC900F10C59 /* CustomCells */ = {
+			isa = PBXGroup;
+			children = (
+				4A48A54D260791840091CA62 /* ListsTableViewCell.swift */,
+			);
+			path = CustomCells;
+			sourceTree = "<group>";
+		};
+		4AC6CD36260A7AE600F10C59 /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				4A48A52B26077D440091CA62 /* Main.storyboard */,
+				4A48A53326077D480091CA62 /* LaunchScreen.storyboard */,
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		4AC6CD37260A7AF200F10C59 /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				4A48A52526077D430091CA62 /* AppDelegate.swift */,
+				4A48A52726077D430091CA62 /* SceneDelegate.swift */,
+			);
+			path = Delegates;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -155,6 +190,7 @@
 				4A48A54326077EC90091CA62 /* StorageManager.swift in Sources */,
 				4A48A53026077D440091CA62 /* ToDoApp.xcdatamodeld in Sources */,
 				4A48A54B260789240091CA62 /* AlertController.swift in Sources */,
+				4AC6CD32260A7A7800F10C59 /* TasksTableViewController.swift in Sources */,
 				4A48A546260783D90091CA62 /* ListsTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
