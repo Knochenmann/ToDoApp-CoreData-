@@ -18,9 +18,12 @@ class TasksTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.reloadData()
+        
         title = currentList.name
         currentTasks = tasks?.filter({$0.isCompleted == false})
         completedTasks = tasks?.filter({$0.isCompleted})
+        
+        tableView.allowsSelection = false
         
     }
 
@@ -28,11 +31,8 @@ class TasksTableViewController: UITableViewController {
     
     // MARK: - Table view data source
     
-    
-    
     // MARK: Sections
 
-    
     override func numberOfSections(in tableView: UITableView) -> Int {
         2
     }

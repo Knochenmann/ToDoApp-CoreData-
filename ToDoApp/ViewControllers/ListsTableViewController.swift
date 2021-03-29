@@ -15,10 +15,8 @@ class ListsTableViewController: UITableViewController {
         lists = StorageManager.shared.fetchData()
         tableView.reloadData()
     }
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-    }
+    
+    
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -31,8 +29,16 @@ class ListsTableViewController: UITableViewController {
         cell.listName.text = lists[indexPath.row].name
         cell.listNote.text = lists[indexPath.row].note
         
+        //Right-side marker indicating a number of uncompleted tasks:
+        
         let completedTasksCounter = lists[indexPath.row].tasks?.filter({($0 as! Task).isCompleted == false}).count
-        cell.tasks.text = "\(completedTasksCounter ?? 0)"
+        let currentTasksCounter = lists[indexPath.row].tasks?.filter({($0 as! Task).isCompleted == true}).count
+        
+        if completedTasksCounter == 0 && currentTasksCounter != 0 {
+            cell.tasks.text = "☑️"
+        } else {
+            cell.tasks.text = "\(completedTasksCounter ?? 0)"
+        }
         
         return cell
     }
@@ -41,12 +47,14 @@ class ListsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [unowned self] (_, _, _) in
+            
             StorageManager.shared.delete(taskList: self.lists[indexPath.row])
             self.lists.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
         
         let editAction = UIContextualAction(style: .normal, title: "Edit") { [unowned self] (_, _, isDone) in
+            
             AlertController.showAlert(ofType: .edit,
                                       forObject: .list) { (alert) in
                 self.lists[indexPath.row].name = alert.textFields?.first?.text
@@ -72,7 +80,7 @@ class ListsTableViewController: UITableViewController {
  
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let indexPath = tableView.indexPathForSelectedRow else { return }
-         let tasksVC = segue.destination as! TasksTableViewController
+        let tasksVC = segue.destination as! TasksTableViewController
         tasksVC.currentList = lists[indexPath.row]
     }
 
@@ -81,6 +89,7 @@ class ListsTableViewController: UITableViewController {
     }
 
     @IBAction func addNewList(_ sender: Any) {
+        
         AlertController.showAlert(ofType: .add, forObject: .list) { (alert) in
             StorageManager.shared.addNewTaskList { [unowned self] (newList) in
                 newList.name = alert.textFields?.first?.text
