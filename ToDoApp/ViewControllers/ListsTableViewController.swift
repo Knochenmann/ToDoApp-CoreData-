@@ -15,7 +15,10 @@ class ListsTableViewController: UITableViewController {
         lists = StorageManager.shared.fetchData()
         tableView.reloadData()
     }
- 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+    }
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -27,7 +30,9 @@ class ListsTableViewController: UITableViewController {
 
         cell.listName.text = lists[indexPath.row].name
         cell.listNote.text = lists[indexPath.row].note
-        cell.tasks.text = "\(lists[indexPath.row].tasks?.count ?? 0)"
+        
+        let completedTasksCounter = lists[indexPath.row].tasks?.filter({($0 as! Task).isCompleted == false}).count
+        cell.tasks.text = "\(completedTasksCounter ?? 0)"
         
         return cell
     }
@@ -55,7 +60,7 @@ class ListsTableViewController: UITableViewController {
 
             isDone(true)
         }
-        editAction.backgroundColor = .magenta
+        editAction.backgroundColor = #colorLiteral(red: 0, green: 0.5898008943, blue: 1, alpha: 1)
         
         let actions = UISwipeActionsConfiguration(actions: [deleteAction, editAction])
         
@@ -88,7 +93,5 @@ class ListsTableViewController: UITableViewController {
         } presentingClouser: { (alert) in
             present(alert, animated: true)
         }
-
     }
-    
 }

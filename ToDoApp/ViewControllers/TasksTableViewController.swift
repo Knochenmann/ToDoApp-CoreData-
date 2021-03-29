@@ -19,65 +19,51 @@ class TasksTableViewController: UITableViewController {
         super.viewDidLoad()
         tableView.reloadData()
         title = currentList.name
+        currentTasks = tasks?.filter({$0.isCompleted == false})
+        completedTasks = tasks?.filter({$0.isCompleted})
+        
     }
-    // MARK: - Apperance
-    
-    
-    @objc private func showAddingAlert() {
-        let alert = UIAlertController(title: "New Task",
-                                      message: "Add new task",
-                                      preferredStyle: .alert)
-        
-        alert.addTextField { (textField) in
-            textField.placeholder = "Type a task"
-        }
-        alert.addTextField { (textField) in
-            textField.placeholder = "Add a note"
-        }
-        
-        let addAction = UIAlertAction(title: "Add", style: .default) { [unowned self] (_) in
-            
-            StorageManager.shared.addNewTask { [unowned self] (newTask) in
-                newTask.name = alert.textFields?.first?.text
-                newTask.note = alert.textFields?.last?.text
-                newTask.date = Date()
-                newTask.isCompleted = false
-                currentList.addToTasks(newTask)
-                tasks?.append(newTask)
-                let index = IndexPath(row: self.tasks!.count - 1, section: 0)
-                self.tableView.insertRows(at: [index], with: .automatic)
-            }
-            
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { [unowned self] (_) in
-            self.dismiss(animated: true)
-        }
-        
-        alert.addAction(addAction)
-        alert.addAction(cancelAction)
-        
-        present(alert, animated: true)
-    }
-    
 
+    
+    
     // MARK: - Table view data source
+    
+    
+    
+    // MARK: Sections
 
-//    override func numberOfSections(in tableView: UITableView) -> Int {
-//        2
-//    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tasks?.count ?? 0
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        2
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return "Current Tasks"
+        } else {
+            return "Completed Tasks"
+        }
     }
 
-
+    
+    // MARK: Rows
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return currentTasks?.count ?? 0
+        } else {
+            return completedTasks?.count ?? 0
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "task", for: indexPath)
-
+        let section = indexPath.section  == 0 ? currentTasks : completedTasks
+            
         var content = cell.defaultContentConfiguration()
-        content.text = tasks?[indexPath.row].name
-        content.secondaryText = tasks?[indexPath.row].note
+        content.text = section?[indexPath.row].name ?? ""
+        content.secondaryText = section?[indexPath.row].note ?? ""
         cell.contentConfiguration = content
 
         return cell
@@ -85,20 +71,34 @@ class TasksTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        
+
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (_, _, _) in
-            StorageManager.shared.delete(task: (self.tasks![indexPath.row]))
-            self.tasks?.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
+            if indexPath.section == 0 {
+                StorageManager.shared.delete(task: (self.currentTasks[indexPath.row]))
+                self.currentTasks.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            } else {
+                StorageManager.shared.delete(task: (self.completedTasks[indexPath.row]))
+                self.completedTasks.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
         }
         
         let editAction = UIContextualAction(style: .normal, title: "Edit") { (_, _, isDone) in
-            AlertController.showAlert(ofType: .edit,
-                                      forObject: .task) { (alert) in
-                self.tasks?[indexPath.row].name = alert.textFields?.first?.text
-                self.tasks?[indexPath.row].note = alert.textFields?.last?.text
+            
+            AlertController.showAlert(ofType: .edit, forObject: .task) { [unowned self] (alert) in
+                
+                if indexPath.section == 0 {
+                    self.currentTasks[indexPath.row].name = alert.textFields?.first?.text
+                    self.currentTasks[indexPath.row].note = alert.textFields?.last?.text
+                } else {
+                    self.completedTasks[indexPath.row].name = alert.textFields?.first?.text
+                    self.completedTasks[indexPath.row].note = alert.textFields?.last?.text
+                }
+                
                 StorageManager.shared.saveContext()
                 self.tableView.reloadData()
+                
             } presentingClouser: { (alert) in
                 self.present(alert, animated: true)
             }
@@ -106,25 +106,38 @@ class TasksTableViewController: UITableViewController {
             isDone(true)
         }
         
-        let completeAction = UIContextualAction(style: .normal, title: "Complete") { (_, _, isDone) in
-            self.tasks?[indexPath.row].isCompleted.toggle()
+        let completionLabel = indexPath.section == 0 ? "Complete" : "Uncomplete"
+        
+        let completeAction = UIContextualAction(style: .normal, title: completionLabel) { (_, _, isDone) in
+            
+            if indexPath.section == 0 {
+                self.currentTasks?[indexPath.row].isCompleted.toggle()
+                self.completedTasks?.append(self.currentTasks![indexPath.row])
+                self.currentTasks?.remove(at: indexPath.row)
+            } else {
+                self.completedTasks?[indexPath.row].isCompleted.toggle()
+                self.currentTasks?.append(self.completedTasks![indexPath.row])
+                self.completedTasks?.remove(at: indexPath.row)
+            }
+            tableView.reloadData()
+            
             StorageManager.shared.saveContext()
+            
             isDone(true)
             
         }
         
-        editAction.backgroundColor = .magenta
-        completeAction.backgroundColor = .systemGreen
+        editAction.backgroundColor = #colorLiteral(red: 0, green: 0.5898008943, blue: 1, alpha: 1)
+        completeAction.backgroundColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
         
         let actions = UISwipeActionsConfiguration(actions: [completeAction, editAction, deleteAction])
         
         return actions
     }
     
-    deinit {
-        print("TasksVC has been dealocated")
-    }
     
+    // MARK: - IBActions
+ 
     @IBAction func addNewTask(_ sender: Any) {
         AlertController.showAlert(ofType: .add,
                                   forObject: .task) { (alert) in
@@ -135,8 +148,8 @@ class TasksTableViewController: UITableViewController {
                 newTask.date = Date()
                 newTask.isCompleted = false
                 currentList.addToTasks(newTask)
-                tasks?.append(newTask)
-                let index = IndexPath(row: self.tasks!.count - 1, section: 0)
+                currentTasks?.append(newTask)
+                let index = IndexPath(row: self.currentTasks!.count - 1, section: 0)
                 self.tableView.insertRows(at: [index], with: .automatic)
             }
             
@@ -146,49 +159,7 @@ class TasksTableViewController: UITableViewController {
         }
     }
     
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    deinit {
+        print("TasksVC has been dealocated")
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
